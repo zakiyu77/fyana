@@ -504,7 +504,7 @@
 
         <!-- Tools Grid -->
         <div class="tools-section">
-           <div class="tool-card" onclick="redirectTo('instagram.html')">
+           <div class="tool-card" onclick="redirectTo('/instagram')">
     <span class="tool-icon">
         <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram" width="30" height="30">
     </span>
@@ -512,28 +512,13 @@
     <p>Download foto, video, reels & stories</p>
 </div>
 
-<div class="tool-card" onclick="redirectTo('tiktok.html')">
+<div class="tool-card" onclick="redirectTo('/tiktok')">
     <span class="tool-icon">
         <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg" alt="TikTok" width="30" height="30">
     </span>
     <h3>TikTok</h3>
     <p>Download video tanpa watermark</p>
 </div>
-
-<script>
-function redirectTo(page) {
-    // Redirect ke file .html
-    window.location.href = page;
-}
-
-// Setelah halaman load, hilangkan .html di address bar
-window.addEventListener('load', () => {
-    if(window.location.pathname.endsWith('.html')) {
-        const cleanPath = window.location.pathname.replace('.html','');
-        window.history.replaceState({}, '', cleanPath);
-    }
-});
-</script>
             </div>
         </div>
 
