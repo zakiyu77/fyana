@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FYANA TOOLS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #f5f7fa;
+            --bg-secondary: #ffffff;
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --accent: #4299e1;
+            --accent-hover: #3182ce;
+            --border: #e2e8f0;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1a202c;
+            --bg-secondary: #2d3748;
+            --text-primary: #f7fafc;
+            --text-secondary: #cbd5e0;
+            --accent: #4299e1;
+            --accent-hover: #63b3ed;
+            --border: #4a5568;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 0.3s ease;
+        }
+
+        .container {
+            max-width: 450px;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .menu-btn:hover {
+            background: var(--bg-primary);
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-btn:hover {
+            background: var(--bg-primary);
+        }
+
+        /* Banner Slider */
+        .banner-container {
+            padding: 20px;
+        }
+
+        .banner-slider {
+            position: relative;
+            width: 100%;
+            height: 160px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .slides-wrapper {
+            display: flex;
+            transition: transform 0.4s ease-in-out;
+            height: 100%;
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .slide2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .slide3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .slide4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+
+        .slide-content-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            padding: 24px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .slide-text {
+            flex: 1;
+            color: white;
+        }
+
+        .slide-text h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .slide-text p {
+            font-size: 12px;
+            opacity: 0.9;
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+
+        .slide-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .slide2 .slide-btn { color: #f5576c; }
+        .slide3 .slide-btn { color: #00f2fe; }
+        .slide4 .slide-btn { color: #38f9d7; }
+
+        .slide-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .slide-icon {
+            font-size: 56px;
+            margin-left: 12px;
+        }
+
+        .dots {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+            z-index: 3;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.4);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background: white;
+            width: 20px;
+            border-radius: 3px;
+        }
+
+        /* Tools Section */
+        .tools-section {
+            padding: 0 20px 24px 20px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .tool-card {
+            background: var(--bg-secondary);
+            padding: 24px 16px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px var(--shadow);
+        }
+
+        .tool-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .tool-card h3 {
+            font-size: 15px;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .tool-card p {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* Popular Downloads Section */
+        .popular-section {
+            background: var(--bg-secondary);
+            margin: 0 20px 24px 20px;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 17px;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .download-items {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .download-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg-primary);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .download-item:hover {
+            transform: translateX(4px);
+        }
+
+        .download-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .ig-icon { background: linear-gradient(135deg, #e1306c, #f77737); }
+        .tt-icon { background: linear-gradient(135deg, #00f2ea, #ff0050); }
+
+        .download-info {
+            flex: 1;
+        }
+
+        .download-info h4 {
+            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+            font-weight: 600;
+        }
+
+        .download-info p {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .download-arrow {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        /* Features Section */
+        .features-section {
+            background: var(--bg-secondary);
+            margin: 0 20px 24px 20px;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .feature-item {
+            text-align: center;
+            padding: 12px 8px;
+            background: var(--bg-primary);
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+
+        .feature-item:hover {
+            transform: scale(1.05);
+        }
+
+        .feature-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .feature-item h4 {
+            font-size: 12px;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Info Section */
+        .info-section {
+            background: var(--bg-secondary);
+            margin: 0 20px 24px 20px;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .info-section h3 {
+            font-size: 17px;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .info-section p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .info-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info-section li {
+            font-size: 13px;
+            color: var(--text-secondary);
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            line-height: 1.5;
+        }
+
+        .info-section li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <button class="menu-btn">☰</button>
+            <div class="header-icons">
+                <button class="icon-btn" id="themeToggle" onclick="toggleTheme()">☀️</button>
+            </div>
+        </header>
+
+        <!-- Banner Slider -->
+        <div class="banner-container">
+            <div class="banner-slider">
+                <div class="slides-wrapper" id="slides">
+                    <div class="slide slide1">
+                        <div class="slide-content-wrapper">
+                            <div class="slide-text">
+                                <h2>Download Tanpa Watermark</h2>
+                                <p>Simpan video & foto dari Instagram dan TikTok dengan mudah</p>
+                                <button class="slide-btn">Mulai Download</button>
+                            </div>
+                            <div class="slide-icon">📥</div>
+                        </div>
+                    </div>
+
+                    <div class="slide slide2">
+                        <div class="slide-content-wrapper">
+                            <div class="slide-text">
+                                <h2>Cepat & Praktis</h2>
+                                <p>Copy link, paste, dan download. Sesimpel itu!</p>
+                                <button class="slide-btn">Coba Sekarang</button>
+                            </div>
+                            <div class="slide-icon">⚡</div>
+                        </div>
+                    </div>
+
+                    <div class="slide slide3">
+                        <div class="slide-content-wrapper">
+                            <div class="slide-text">
+                                <h2>Kualitas HD Terbaik</h2>
+                                <p>Dapatkan video dengan resolusi maksimal</p>
+                                <button class="slide-btn">Download HD</button>
+                            </div>
+                            <div class="slide-icon">🎬</div>
+                        </div>
+                    </div>
+
+                    <div class="slide slide4">
+                        <div class="slide-content-wrapper">
+                            <div class="slide-text">
+                                <h2>Aman & Private</h2>
+                                <p>Data kamu aman, tidak ada riwayat tersimpan</p>
+                                <button class="slide-btn">Lebih Aman</button>
+                            </div>
+                            <div class="slide-icon">🔒</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dots">
+                    <span class="dot active" onclick="goToSlide(0)"></span>
+                    <span class="dot" onclick="goToSlide(1)"></span>
+                    <span class="dot" onclick="goToSlide(2)"></span>
+                    <span class="dot" onclick="goToSlide(3)"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tools Grid -->
+        <div class="tools-section">
+           <div class="tool-card" onclick="redirectTo('instagram.html')">
+    <span class="tool-icon">
+        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram" width="30" height="30">
+    </span>
+    <h3>Instagram</h3>
+    <p>Download foto, video, reels & stories</p>
+</div>
+
+<div class="tool-card" onclick="redirectTo('tiktok.html')">
+    <span class="tool-icon">
+        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg" alt="TikTok" width="30" height="30">
+    </span>
+    <h3>TikTok</h3>
+    <p>Download video tanpa watermark</p>
+</div>
+
+<script>
+function redirectTo(page) {
+    // Redirect ke file .html
+    window.location.href = page;
+}
+
+// Setelah halaman load, hilangkan .html di address bar
+window.addEventListener('load', () => {
+    if(window.location.pathname.endsWith('.html')) {
+        const cleanPath = window.location.pathname.replace('.html','');
+        window.history.replaceState({}, '', cleanPath);
+    }
+});
+</script>
+            </div>
+        </div>
+
+        <!-- Popular Downloads -->
+        <div class="popular-section">
+            <div class="section-header">
+                <span style="font-size: 20px;">🔥</span>
+                <h2 class="section-title">Sering Didownload</h2>
+            </div>
+            <div class="download-items">
+                <div class="download-item">
+                    <div class="download-icon ig-icon">📷</div>
+                    <div class="download-info">
+                        <h4>Instagram Reels</h4>
+                        <p>Download reels favorit kamu</p>
+                    </div>
+                    <span class="download-arrow">→</span>
+                </div>
+                <div class="download-item">
+                    <div class="download-icon tt-icon">🎵</div>
+                    <div class="download-info">
+                        <h4>TikTok Video</h4>
+                        <p>Simpan video tanpa watermark</p>
+                    </div>
+                    <span class="download-arrow">→</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="features-section">
+            <div class="section-header">
+                <span style="font-size: 20px;">✨</span>
+                <h2 class="section-title">Fitur Unggulan</h2>
+            </div>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">⚡</div>
+                    <h4>Super Cepat</h4>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🆓</div>
+                    <h4>Gratis</h4>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🔒</div>
+                    <h4>Aman</h4>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📱</div>
+                    <h4>No App</h4>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🎬</div>
+                    <h4>HD Quality</h4>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">❌</div>
+                    <h4>No Watermark</h4>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Section -->
+        <div class="info-section">
+<h3>Informasi Pengguna :</h3>
+<ul>
+    <li><strong>IP Address:</strong> <span id="ip"></span></li>
+    <li><strong>Kota:</strong> <span id="city"></span></li>
+    <li><strong>Wilayah/Provinsi:</strong> <span id="region"></span></li>
+    <li><strong>Negara:</strong> <span id="country"></span></li>
+    <li><strong>Kode Pos:</strong> <span id="postal"></span></li>
+    <li><strong>Koordinat:</strong> <span id="latitude"></span>, <span id="longitude"></span></li>
+    <li><strong>Provider Internet:</strong> <span id="org"></span></li>
+    <li><strong>Zona Waktu:</strong> <span id="timezone"></span></li>
+    <li><strong>Browser:</strong> <span id="browser"></span></li>
+    <li><strong>Sistem Operasi:</strong> <span id="os"></span></li>
+    <li><strong>Perangkat:</strong> <span id="device"></span></li>
+    <li><strong>Bahasa:</strong> <span id="language"></span></li>
+</ul>
+
+<script>
+    // Fungsi untuk mendeteksi OS dan perangkat
+    function getDeviceInfo() {
+        const ua = navigator.userAgent;
+        let os = "Tidak diketahui";
+        let device = /Mobile|Android|iP(hone|od|ad)|IEMobile|BlackBerry|Opera Mini/i.test(ua)
+            ? "Mobile"
+            : "Desktop";
+
+        if (/Windows/i.test(ua)) os = "Windows";
+        else if (/Mac/i.test(ua)) os = "MacOS";
+        else if (/Linux/i.test(ua)) os = "Linux";
+        else if (/Android/i.test(ua)) os = "Android";
+        else if (/iPhone|iPad|iPod/i.test(ua)) os = "iOS";
+
+        return { os, device };
+    }
+
+    const info = getDeviceInfo();
+
+    // Tampilkan info browser, OS, device, dan bahasa
+    document.getElementById("browser").innerText = navigator.userAgent;
+    document.getElementById("os").innerText = info.os;
+    document.getElementById("device").innerText = info.device;
+    document.getElementById("language").innerText = navigator.language;
+
+    // Ambil data IP dan lokasi
+    fetch("https://ipapi.co/json/")
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("ip").innerText = data.ip;
+            document.getElementById("city").innerText = data.city;
+            document.getElementById("region").innerText = data.region;
+            document.getElementById("country").innerText = data.country_name;
+            document.getElementById("postal").innerText = data.postal;
+            document.getElementById("latitude").innerText = data.latitude;
+            document.getElementById("longitude").innerText = data.longitude;
+            document.getElementById("org").innerText = data.org;
+            document.getElementById("timezone").innerText = data.timezone;
+        })
+        .catch(() => {
+            document.getElementById("ip").innerText = "Gagal memuat data lokasi";
+        });
+</script>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>© 2024 DownloadHub. All rights reserved.</p>
+            <p style="margin-top: 8px; font-size: 11px;">Made with ❤️ Zaki</p>
+        </footer>
+    </div>
+
+    <script>
+        // Theme Toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeToggle = document.getElementById('themeToggle');
+            const currentTheme = html.getAttribute('data-theme');
+            
+            if (currentTheme === 'dark') {
+                html.removeAttribute('data-theme');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.getElementById('themeToggle').textContent = '🌙';
+        }
+
+        // Slider functionality
+        let currentSlide = 0;
+        const slides = document.getElementById('slides');
+        const dots = document.querySelectorAll('.dot');
+        const totalSlides = 4;
+
+        function goToSlide(index) {
+            currentSlide = index;
+            slides.style.transform = `translateX(-${currentSlide * 100}%)`;
+            updateDots();
+        }
+
+        function updateDots() {
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            goToSlide(currentSlide);
+        }
+
+        setInterval(nextSlide, 5000);
+    </script>
+</body>
+</html>

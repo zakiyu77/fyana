@@ -1,0 +1,506 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tiktok Downloader</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: "Inter", sans-serif;
+      background: #0a0e27;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: gridMove 20s linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    @keyframes gridMove {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(50px, 50px); }
+    }
+    
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+      animation: fadeInDown 0.6s ease;
+    }
+    
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+    
+    .subtitle {
+      font-size: 14px;
+      color: #64748b;
+      font-weight: 400;
+    }
+    
+    .input-group {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(6, 182, 212, 0.1);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      animation: fadeInUp 0.6s ease 0.1s both;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    select, input {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(100, 116, 139, 0.2);
+      border-radius: 10px;
+      color: #e2e8f0;
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 0.3s ease;
+      margin-bottom: 12px;
+    }
+    
+    select:focus, input:focus {
+      outline: none;
+      border-color: #06b6d4;
+      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+    }
+    
+    select option {
+      background: #1e293b;
+      color: #e2e8f0;
+    }
+    
+    button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 0;
+    }
+    
+    button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    button:hover::before {
+      left: 100%;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(6, 182, 212, 0.3);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+      animation: fadeInUp 0.4s ease;
+    }
+    
+    .loading.active {
+      display: block;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(6, 182, 212, 0.1);
+      border-top-color: #06b6d4;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .loading-text {
+      color: #64748b;
+      font-size: 14px;
+    }
+    
+    .result {
+      display: none;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(6, 182, 212, 0.1);
+      border-radius: 16px;
+      padding: 24px;
+      animation: fadeInUp 0.5s ease;
+    }
+    
+    .result.active {
+      display: block;
+    }
+    
+    .result-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #e2e8f0;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+    
+    .media-container {
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    img, video {
+      width: 100%;
+      display: block;
+      background: #1e293b;
+    }
+    
+    .download-btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+      color: #fff;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      margin-bottom: 12px;
+    }
+    
+    .download-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(6, 182, 212, 0.3);
+    }
+    
+    .toggle-json {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(100, 116, 139, 0.2);
+      color: #94a3b8;
+      text-align: center;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .toggle-json:hover {
+      background: rgba(30, 41, 59, 0.9);
+      border-color: rgba(6, 182, 212, 0.3);
+      color: #06b6d4;
+    }
+    
+    .json-container {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+    }
+    
+    .json-container.active {
+      max-height: 400px;
+      margin-top: 12px;
+    }
+    
+    .json-box {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(100, 116, 139, 0.2);
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 12px;
+      font-family: 'Courier New', monospace;
+      overflow-x: auto;
+      max-height: 350px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    
+    .json-box::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    
+    .json-box::-webkit-scrollbar-track {
+      background: rgba(30, 41, 59, 0.5);
+      border-radius: 3px;
+    }
+    
+    .json-box::-webkit-scrollbar-thumb {
+      background: rgba(6, 182, 212, 0.3);
+      border-radius: 3px;
+    }
+    
+    .json-box::-webkit-scrollbar-thumb:hover {
+      background: rgba(6, 182, 212, 0.5);
+    }
+    
+    .error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      padding: 16px;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 14px;
+      animation: fadeInUp 0.4s ease;
+    }
+    
+    @media (max-width: 640px) {
+      body {
+        padding: 16px;
+      }
+      
+      h1 {
+        font-size: 24px;
+      }
+      
+      .subtitle {
+        font-size: 13px;
+      }
+      
+      .input-group {
+        padding: 20px;
+      }
+      
+      select, input, button, .download-btn {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Tiktok Downloader</h1>
+      <p class="subtitle">Unduh video Tiktok</p>
+    </header>
+
+<div class="input-group">
+  <input type="hidden" id="platform" value="tiktok">
+  <input type="text" id="url" placeholder="Tempel URL video di sini...">
+  <button onclick="download()">🚀 Download Sekarang</button>
+</div>
+
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+      <div class="loading-text">Memproses permintaan...</div>
+    </div>
+
+    <div id="result" class="result"></div>
+  </div>    
+
+<script>
+let jsonVisible = false;
+
+// Fungsi untuk memfilter JSON agar beberapa key tidak tampil
+function filterJson(obj) {
+  const forbiddenKeys = ['size','wm_size','music','ai_dynamic_cover','cover','origin','origin_cover','avatar'];
+  
+  if (Array.isArray(obj)) return obj.map(filterJson);
+  if (obj !== null && typeof obj === 'object') {
+    const newObj = {};
+    for (const key in obj) {
+      if (!forbiddenKeys.includes(key)) {
+        newObj[key] = filterJson(obj[key]);
+      }
+    }
+    return newObj;
+  }
+  return obj;
+}
+
+async function download() {
+  const url = document.getElementById("url").value.trim();
+  const resultBox = document.getElementById("result");
+  const loadingBox = document.getElementById("loading");
+
+  if (!url) {
+    showError("⚠️ Mohon masukkan URL video terlebih dahulu");
+    return;
+  }
+
+  resultBox.classList.remove("active");
+  loadingBox.classList.add("active");
+
+  try {
+    const res = await fetch(`/api/tiktok?url=${encodeURIComponent(url)}`);
+    const data = await res.json();
+
+    loadingBox.classList.remove("active");
+
+    if (!data.success) throw new Error(data.message || "Gagal mendapatkan data");
+
+    const video = data.data.play || data.data.hdplay;
+    const title = data.data.title || "Tanpa Judul";
+    const author = data.data.author.nickname || "Unknown";
+
+    const filteredData = filterJson(data);
+    filteredData.made_by = "MADE WITH FYANA🦋";
+
+    resultBox.innerHTML = `
+      <div class="result-title">👤 Author: ${escapeHtml(author)}</div>
+      ${video ? `<div class="media-container"><video src="${video}" controls></video></div>` : ""}
+      ${video ? `<a href="#" class="download-btn" onclick="downloadFile('${video}', '${escapeHtml(title)}'); return false;">⬇️ Unduh Video</a>` : ""}
+      <button class="toggle-json" onclick="toggleJson()">💡 Lihat JSON Response</button>
+      <div id="json-container" class="json-container">
+        <div class="json-box">${syntaxHighlight(filteredData)}</div>
+      </div>
+    `;
+
+    resultBox.classList.add("active");
+    jsonVisible = false;
+  } catch (err) {
+    loadingBox.classList.remove("active");
+    showError(`❌ ${err.message}`);
+  }
+}
+
+function toggleJson() {
+  const container = document.getElementById("json-container");
+  jsonVisible = !jsonVisible;
+  container.classList.toggle("active", jsonVisible);
+}
+
+async function downloadFile(url, filename) {
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = blobUrl;
+    a.download = filename.replace(/[^a-z0-9]/gi, '_').substring(0, 50) + '.mp4';
+
+    document.body.appendChild(a);
+    a.click();
+
+    window.URL.revokeObjectURL(blobUrl);
+    document.body.removeChild(a);
+  } catch (err) {
+    showError('❌ Gagal mengunduh video. Silakan coba lagi.');
+  }
+}
+
+function showError(message) {
+  const resultBox = document.getElementById("result");
+  resultBox.innerHTML = `<div class="error">${message}</div>`;
+  resultBox.classList.add("active");
+}
+
+function escapeHtml(text) {
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+  return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+function syntaxHighlight(json) {
+  if (typeof json !== 'string') json = JSON.stringify(json, undefined, 2);
+  json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return json.replace(
+    /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+    function (match) {
+      let cls = 'number';
+      if (/^"/.test(match)) cls = /:$/.test(match) ? 'key' : 'string';
+      else if (/true|false/.test(match)) cls = 'boolean';
+      else if (/null/.test(match)) cls = 'null';
+      return `<span style="color:${
+        cls==='key' ? '#06b6d4' :
+        cls==='string' ? '#34d399' :
+        cls==='number' ? '#fbbf24' :
+        cls==='boolean' ? '#f87171' : '#94a3b8'
+      }">${match}</span>`;
+    }
+  );
+}
+</script>
+</body>
+</html>

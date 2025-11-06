@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Instagram Downloader</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:"Inter",sans-serif;background:#0a0e27;color:#e2e8f0;
+      min-height:100vh;display:flex;flex-direction:column;align-items:center;
+      padding:20px;position:relative;overflow-x:hidden
+    }
+    body::before{
+      content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;
+      background:radial-gradient(circle,rgba(6,182,212,.03)1px,transparent 1px);
+      background-size:50px 50px;animation:gridMove 20s linear infinite;
+      pointer-events:none;z-index:0
+    }
+    @keyframes gridMove{0%{transform:translate(0,0)}100%{transform:translate(50px,50px)}}
+    .back-button{
+      position:fixed;top:20px;left:10px;width:32px;height:32px;
+      background:rgba(15,23,42,.8);backdrop-filter:blur(10px);
+      border:1px solid rgba(236,72,153,.2);border-radius:12px;
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;transition:all .3s ease;z-index:100;text-decoration:none;
+      color:#e2e8f0;font-size:20px
+    }
+    .back-button:hover{
+      background:rgba(236,72,153,.15);border-color:#ec4899;
+      transform:translateX(-4px);box-shadow:0 4px 12px rgba(236,72,153,.2)
+    }
+    .container{position:relative;z-index:1;width:100%;max-width:520px;margin:0 auto}
+    header{text-align:center;margin-bottom:32px;animation:fadeInDown .6s ease}
+    @keyframes fadeInDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+    h1{font-size:28px;font-weight:700;background:linear-gradient(135deg,#d946ef 0%,#ec4899 100%);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;letter-spacing:-.5px}
+    .subtitle{font-size:14px;color:#64748b;font-weight:400}
+    .input-group{
+      background:rgba(15,23,42,.6);backdrop-filter:blur(10px);
+      border:1px solid rgba(236,72,153,.1);border-radius:16px;
+      padding:24px;margin-bottom:24px;animation:fadeInUp .6s ease .1s both
+    }
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    input{
+      width:100%;padding:12px 16px;background:rgba(30,41,59,.8);
+      border:1px solid rgba(100,116,139,.2);border-radius:10px;color:#e2e8f0;
+      font-size:14px;margin-bottom:12px;transition:all .3s ease
+    }
+    input:focus{outline:none;border-color:#ec4899;box-shadow:0 0 0 3px rgba(236,72,153,.15)}
+    button{
+      width:100%;padding:14px;background:linear-gradient(135deg,#d946ef 0%,#ec4899 100%);
+      border:none;border-radius:10px;color:#fff;font-size:15px;font-weight:600;
+      cursor:pointer;transition:all .3s ease;position:relative;overflow:hidden
+    }
+    button::before{
+      content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);
+      transition:left .5s ease
+    }
+    button:hover::before{left:100%}
+    button:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(236,72,153,.3)}
+    .loading{display:none;text-align:center;padding:40px 20px;animation:fadeInUp .4s ease}
+    .loading.active{display:block}
+    .spinner{
+      width:40px;height:40px;border:3px solid rgba(236,72,153,.1);
+      border-top-color:#ec4899;border-radius:50%;animation:spin .8s linear infinite;
+      margin:0 auto 16px
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading-text{color:#64748b;font-size:14px}
+    .result{display:none;background:rgba(15,23,42,.6);backdrop-filter:blur(10px);
+      border:1px solid rgba(236,72,153,.1);border-radius:16px;padding:24px;animation:fadeInUp .5s ease}
+    .result.active{display:block}
+    .result-title{font-size:16px;font-weight:600;color:#e2e8f0;margin-bottom:16px;line-height:1.5}
+    .media-container{border-radius:12px;overflow:hidden;margin-bottom:16px;
+      box-shadow:0 4px 20px rgba(0,0,0,.3);background:#1e293b}
+    img,video{width:100%;display:block;max-height:500px;object-fit:contain}
+    .download-btn{
+      display:block;width:100%;padding:14px;background:linear-gradient(135deg,#d946ef 0%,#ec4899 100%);
+      color:#fff;text-align:center;text-decoration:none;border-radius:10px;
+      font-weight:600;font-size:15px;transition:all .3s ease;margin-bottom:12px;cursor:pointer;border:none
+    }
+    .download-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(236,72,153,.3)}
+    .toggle-json{
+      display:block;width:100%;padding:12px;background:rgba(30,41,59,.6);
+      border:1px solid rgba(100,116,139,.2);color:#94a3b8;text-align:center;
+      border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:all .3s ease
+    }
+    .toggle-json:hover{background:rgba(30,41,59,.9);border-color:rgba(236,72,153,.3);color:#ec4899}
+    .json-container{max-height:0;overflow:hidden;transition:max-height .4s ease}
+    .json-container.active{max-height:600px;margin-top:12px}
+    .json-box{
+      background:rgba(15,23,42,.8);border:1px solid rgba(100,116,139,.2);
+      border-radius:8px;padding:16px;font-size:12px;font-family:'Courier New',monospace;
+      overflow:auto;max-height:550px;white-space:pre-wrap;word-break:break-word;
+      color:#94a3b8;line-height:1.6
+    }
+    .json-box .key{color:#ec4899;font-weight:600}
+    .json-box .string{color:#34d399}
+    .json-box .number{color:#fbbf24}
+    .json-box .boolean{color:#f87171}
+    .json-box .null{color:#94a3b8}
+    .error{
+      background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);
+      color:#fca5a5;padding:16px;border-radius:10px;text-align:center;
+      font-size:14px;animation:fadeInUp .4s ease
+    }
+    .info-box{
+      background:rgba(30,41,59,.6);border:1px solid rgba(100,116,139,.2);
+      border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;color:#94a3b8
+    }
+    .info-box .label{color:#64748b;display:inline-block;min-width:80px}
+    .info-box .value{color:#e2e8f0;font-weight:500}
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back-button" title="Kembali ke Home">←</a>
+  
+  <div class="container">
+    <header>
+      <h1>Instagram Downloader</h1>
+      <p class="subtitle">Unduh foto dan video Instagram dengan mudah</p>
+    </header>
+
+    <div class="input-group">
+      <input type="text" id="url" placeholder="Tempel URL postingan Instagram di sini..." />
+      <button onclick="download()">🚀 Download Sekarang</button>
+    </div>
+
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+      <div class="loading-text">Memproses permintaan...</div>
+    </div>
+
+    <div id="result" class="result"></div>
+  </div>
+
+  <script>
+    let jsonVisible = false;
+    let currentMediaData = null;
+
+    function formatJson(obj) {
+      const formatted = {
+        success: obj.success,
+        timestamp: new Date().toISOString(),
+        author: "MADE WITH FYANA🦋",
+        result: {
+          type: obj.result?.type || "unknown",
+          title: obj.result?.title || "Tidak ada judul",
+          thumbnail: obj.result?.thumbnail || null,
+          metadata: {
+            likes: obj.result?.likes || "N/A",
+            comments: obj.result?.comments || "N/A",
+            views: obj.result?.views || "N/A",
+            author: obj.result?.author || "Unknown",
+            caption: obj.result?.caption || "Tidak ada caption",
+            duration: obj.result?.duration || null,
+            timestamp: obj.result?.timestamp || null
+          }
+        }
+      };
+      return formatted;
+    }
+
+    async function download() {
+      const url = document.getElementById("url").value.trim();
+      const resultBox = document.getElementById("result");
+      const loadingBox = document.getElementById("loading");
+
+      if (!url) {
+        showError("⚠️ Mohon masukkan URL Instagram terlebih dahulu");
+        return;
+      }
+
+      resultBox.classList.remove("active");
+      loadingBox.classList.add("active");
+
+      try {
+        const res = await fetch(`/api/instagram?url=${encodeURIComponent(url)}`);
+        const data = await res.json();
+        loadingBox.classList.remove("active");
+
+        if (!data.success) throw new Error(data.message || "Gagal mendapatkan data");
+
+        const media = data.result;
+        currentMediaData = media;
+        const formattedData = formatJson(data);
+
+        let mediaHTML = "";
+        const mediaUrl = media.downloadUrl || media.imageUrl || media.videoUrl;
+        
+        console.log('Full media object:', JSON.stringify(media, null, 2));
+        console.log('Media URL:', mediaUrl);
+        console.log('Media type:', media.type);
+        
+        if (mediaUrl) {
+          // Gunakan multiple proxy services sebagai fallback
+          const proxies = [
+            `https://images.weserv.nl/?url=${encodeURIComponent(mediaUrl)}`,
+            `https://wsrv.nl/?url=${encodeURIComponent(mediaUrl)}`,
+            mediaUrl // original as last fallback
+          ];
+          
+          if (media.type === "video" || mediaUrl.includes('.mp4') || mediaUrl.includes('video')) {
+            mediaHTML = `
+              <video controls muted style="width:100%;max-height:500px;background:#000" preload="metadata">
+                <source src="${mediaUrl}" type="video/mp4">
+              </video>
+              <div style="margin-top:12px;text-align:center">
+                <a href="${mediaUrl}" download style="color:#ec4899;text-decoration:underline;font-size:13px">Jika video tidak muncul, klik di sini untuk download</a>
+              </div>`;
+          } else {
+            mediaHTML = `
+              <div style="position:relative;width:100%;min-height:300px;background:#1e293b;border-radius:8px;overflow:hidden">
+                <img 
+                  id="mediaImage"
+                  src="${proxies[0]}" 
+                  alt="Instagram Media" 
+                  style="width:100%;height:auto;display:block;opacity:0;transition:opacity 0.3s"
+                  onload="this.style.opacity=1; console.log('Image loaded via proxy 1')"
+                  onerror="
+                    console.error('Proxy 1 failed, trying proxy 2...');
+                    this.onerror=null;
+                    this.src='${proxies[1]}';
+                    this.onload=function(){this.style.opacity=1; console.log('Image loaded via proxy 2')};
+                    this.onerror=function(){
+                      console.error('All proxies failed');
+                      this.style.display='none';
+                      document.getElementById('imageFallback').style.display='flex';
+                    }
+                  "
+                />
+                <div id="imageFallback" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;color:#64748b;background:#1e293b">
+                  <div style="font-size:48px;margin-bottom:16px">📸</div>
+                  <div style="margin-bottom:12px;color:#e2e8f0;font-weight:500">Preview tidak tersedia</div>
+                  <div style="margin-bottom:16px;font-size:13px">Gambar akan terdownload langsung saat klik tombol download</div>
+                  <a href="${mediaUrl}" download class="download-btn" style="display:inline-block;width:auto;padding:10px 24px;margin:0">📥 Download Gambar</a>
+                </div>
+              </div>`;
+          }
+        } else {
+          mediaHTML = `<div style="padding:40px;text-align:center;color:#64748b;background:#1e293b;border-radius:8px">
+            <div style="font-size:48px;margin-bottom:16px">⚠️</div>
+            <div>URL media tidak ditemukan dalam response</div>
+          </div>`;
+        }
+
+        const infoHTML = `
+          <div class="info-box">
+            <div><span class="label">📝 Caption:</span> <span class="value">${media.caption || media.title || "Tidak ada caption"}</span></div>
+            ${media.author ? `<div style="margin-top:8px"><span class="label">👤 Author:</span> <span class="value">${media.author}</span></div>` : ''}
+            ${media.likes ? `<div style="margin-top:8px"><span class="label">❤️ Likes:</span> <span class="value">${media.likes}</span></div>` : ''}
+          </div>
+        `;
+
+        resultBox.innerHTML = `
+          <div class="result-title">📸 Hasil Download:</div>
+          ${infoHTML}
+          ${mediaHTML ? `<div class="media-container" style="margin-bottom:16px">${mediaHTML}</div>` : ''}
+          <button class="download-btn" onclick="downloadMedia()" ${!mediaUrl ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>⬇️ Unduh Sekarang</button>
+          <button class="toggle-json" onclick="toggleJson()">💡 Lihat JSON Response</button>
+          <div id="json-container" class="json-container">
+            <div class="json-box">${syntaxHighlight(formattedData)}</div>
+              </div>
+            </div>
+          </div>
+        `;
+        resultBox.classList.add("active");
+        jsonVisible = false;
+      } catch (err) {
+        loadingBox.classList.remove("active");
+        showError(`❌ ${err.message}`);
+      }
+    }
+
+    async function downloadMedia() {
+      if (!currentMediaData) return;
+      
+      const mediaUrl = currentMediaData.downloadUrl || currentMediaData.imageUrl || currentMediaData.videoUrl;
+      if (!mediaUrl) {
+        showError("❌ URL media tidak ditemukan");
+        return;
+      }
+
+      try {
+        // Method 1: Try direct download with blob
+        const response = await fetch(mediaUrl);
+        if (!response.ok) throw new Error('Fetch failed');
+        
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        
+        // Determine file extension
+        let extension = 'jpg';
+        if (currentMediaData.type === 'video' || mediaUrl.includes('.mp4')) {
+          extension = 'mp4';
+        } else if (mediaUrl.includes('.png')) {
+          extension = 'png';
+        }
+        
+        const filename = `instagram_${Date.now()}.${extension}`;
+        a.download = filename;
+        
+        document.body.appendChild(a);
+        a.click();
+        
+        setTimeout(() => {
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+        }, 100);
+      } catch (err) {
+        console.error('Download error:', err);
+        // Fallback: open in new tab
+        window.open(mediaUrl, '_blank', 'noopener,noreferrer');
+      }
+    }
+
+    function toggleJson() {
+      const container = document.getElementById("json-container");
+      jsonVisible = !jsonVisible;
+      container.classList.toggle("active", jsonVisible);
+    }
+
+    function showError(message) {
+      const resultBox = document.getElementById("result");
+      resultBox.innerHTML = `<div class="error">${message}</div>`;
+      resultBox.classList.add("active");
+    }
+
+    function syntaxHighlight(json) {
+      if (typeof json !== "string") json = JSON.stringify(json, undefined, 2);
+      json = json.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return json.replace(
+        /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+        function (match) {
+          let cls = "number";
+          if (/^"/.test(match)) cls = /:$/.test(match) ? "key" : "string";
+          else if (/true|false/.test(match)) cls = "boolean";
+          else if (/null/.test(match)) cls = "null";
+          return `<span class="${cls}">${match}</span>`;
+        }
+      );
+    }
+  </script>
+ 
+</body>
+</html>
